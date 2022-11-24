@@ -1,2 +1,2 @@
 # burhanmutlu.github.io
-bu sayfa yapım aşamasındadır
+Kişisel github.io sayfasıdır.
