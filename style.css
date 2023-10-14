@@ -1,4 +1,23 @@
-body {
+* {
 	margin: 0px;
 	padding: 0px;
+	margin-bottom: 10px;
+}
+
+body {
+	overflow-x: hidden;
+}
+
+.main {
+	padding: 8%;
+	background: rgb(250, 253, 255);
+	display: flex;
+    flex-wrap: wrap;
+}
+
+.main-text {
+	font-size: 20px;
+    font-weight: 300;
+    font-family: sans-serif;
+    color: rgb(14, 13, 13);
 }
