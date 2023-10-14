@@ -1,7 +1,0 @@
-<?php 
-
-
-	echo "merhaba dünya";
-	
-
-?>
