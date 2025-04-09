@@ -1,0 +1,155 @@
+.container { overflow-x: auto; }
+table { min-width: 1200px; border-collapse: collapse; }
+th, td { border: 1px solid black; padding: 0; text-align: center; }
+select, input { width: 100%; min-width: 80px; }
+.weekend { background-color: red; color: white; }
+.weekend input { background-color: red; color: white; }
+.holiday { background-color: purple; color: white; }
+.holiday input { background-color: purple; color: white; }
+.mesai-cell { background-color: #e6e6e6; min-width: 100px; }
+.monthly-hours-cell { background-color: #e6e6e6; min-width: 100px; }
+.monthly-overtime-cell { background-color: #e6e6e6; min-width: 100px; }
+.total-work-cell { background-color: #e6e6e6; min-width: 100px; }
+.normal-hours-cell { background-color: #e6e6e6; min-width: 100px; }
+.overtime-cell { background-color: #e6e6e6; min-width: 100px; }
+.fixed-column { min-width: 120px; }
+.day-column { min-width: 28px; }
+.day-input { min-width: 28px; }
+.leave-type { background-color: #ffeb3b; color: black; }
+.leave-input { background-color: #ffeb3b; color: black; }
+.leave-select {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 100;
+    width: 200px;
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.leave-select div {
+    padding: 8px;
+    cursor: pointer;
+}
+.leave-select div:hover {
+    background-color: #f2f2f2;
+}
+
+/* Butonlar için stil */
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.primary-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #45a049;
+}
+
+.nav-link {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+/* İzin türleri tablosu */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.info-table th, .info-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.info-table th {
+    background-color: #f2f2f2;
+}
+
+/* holidays.html için CSS kodları */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    max-width: 800px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    display: inline-block;
+    width: 100px;
+}
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.nav-button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 4px;
+}
+
+/* holidays.html için tabloyla ilgili CSS kodları */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* Butonlar için genel stil */
+button {
+    padding: 5px 15px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Primary button stil */
+.primary-button {
+    margin-left: 10px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Navigation link stil */
+.nav-link {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+} 

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resmi Tatil Yönetimi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Resmi Tatil Yönetimi</h1>
+    
+    <div class="form-group">
+        <label for="holidayDay">Gün:</label>
+        <input type="number" id="holidayDay" min="1" max="31" style="width: 60px;">
+    </div>
+    
+    <div class="form-group">
+        <label for="holidayMonth">Ay:</label>
+        <select id="holidayMonth" style="width: 120px;">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="holidayName">Tatil Adı:</label>
+        <input type="text" id="holidayName" style="width: 250px;">
+    </div>
+    
+    <div class="form-group">
+        <button onclick="addHoliday()">Tatil Ekle</button>
+        <button onclick="saveHolidays()">Değişiklikleri Kaydet</button>
+        <button onclick="exportHolidays()">JSON Olarak İndir</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importHolidays(event)">
+        <button onclick="document.getElementById('importFile').click()">JSON Dosyası Yükle</button>
+    </div>
+    
+    <h2>Mevcut Resmi Tatiller</h2>
+    <table id="holidaysTable">
+        <thead>
+            <tr>
+                <th>Gün</th>
+                <th>Ay</th>
+                <th>Tatil Adı</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="holidaysList">
+            <!-- Tatiller burada listelenecek -->
+        </tbody>
+    </table>
+    
+    <a href="index.html" class="nav-button">Personel Takip Sayfasına Dön</a>
+    
+    <script>
+        let holidays = [];
+        let formChanged = false;
+        
+        // Tatil günlerini yükle
+        async function loadHolidays() {
+            try {
+                // Önce localStorage'dan yüklemeyi dene
+                const savedHolidays = localStorage.getItem('holidays');
+                if (savedHolidays) {
+                    holidays = JSON.parse(savedHolidays);
+                    displayHolidays();
+                    return true;
+                }
+                
+                // Eğer localStorage'da yoksa, JSON dosyasından yüklemeyi dene
+                const response = await fetch('holidays.json');
+                if (!response.ok) {
+                    throw new Error('Tatil günleri yüklenemedi');
+                }
+                holidays = await response.json();
+                displayHolidays();
+                return true;
+            } catch (error) {
+                console.error('Tatil günleri yüklenirken hata oluştu:', error);
+                // Varsayılan tatiller
+                holidays = [
+                    { month: 1, day: 1, name: "Yeni Yıl" },
+                    { month: 4, day: 23, name: "Ulusal Egemenlik ve Çocuk Bayramı" },
+                    { month: 5, day: 1, name: "İşçi ve Emek Bayramı" },
+                    { month: 5, day: 19, name: "Gençlik ve Spor Bayramı" },
+                    { month: 7, day: 15, name: "Demokrasi ve Milli Birlik Günü" },
+                    { month: 8, day: 30, name: "Zafer Bayramı" },
+                    { month: 10, day: 29, name: "Cumhuriyet Bayramı" }
+                ];
+                displayHolidays();
+                // Varsayılan tatilleri localStorage'a kaydet
+                localStorage.setItem('holidays', JSON.stringify(holidays));
+                return true;
+            }
+        }
+        
+        // Ay adını getir
+        function getMonthName(month) {
+            const months = [
+                'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+            ];
+            return months[month-1];
+        }
+        
+        // Tatilleri listele
+        function displayHolidays() {
+            const tbody = document.getElementById('holidaysList');
+            tbody.innerHTML = '';
+            
+            // Tarihe göre sırala (ay ve gün olarak)
+            const sortedHolidays = [...holidays].sort((a, b) => {
+                if (a.month === b.month) {
+                    return a.day - b.day;
+                }
+                return a.month - b.month;
+            });
+            
+            sortedHolidays.forEach((holiday, index) => {
+                const row = document.createElement('tr');
+                
+                const dayCell = document.createElement('td');
+                dayCell.textContent = holiday.day;
+                row.appendChild(dayCell);
+                
+                const monthCell = document.createElement('td');
+                monthCell.textContent = getMonthName(holiday.month);
+                row.appendChild(monthCell);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = holiday.name;
+                row.appendChild(nameCell);
+                
+                const actionCell = document.createElement('td');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Sil';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = () => removeHoliday(index);
+                actionCell.appendChild(deleteBtn);
+                row.appendChild(actionCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Yeni tatil ekle
+        function addHoliday() {
+            const day = parseInt(document.getElementById('holidayDay').value);
+            const month = parseInt(document.getElementById('holidayMonth').value);
+            const name = document.getElementById('holidayName').value;
+            
+            if (!day || !month || !name) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+            
+            // Zaten var mı kontrol et
+            const exists = holidays.some(h => h.month === month && h.day === day);
+            if (exists) {
+                alert('Bu tarihte zaten bir tatil tanımlanmış!');
+                return;
+            }
+            
+            // Yeni tatil ekle
+            holidays.push({ month, day, name });
+            
+            // Listeyi güncelle
+            displayHolidays();
+            
+            // Alanları temizle
+            document.getElementById('holidayDay').value = '';
+            document.getElementById('holidayName').value = '';
+            
+            // Değişiklik yapıldı
+            formChanged = true;
+        }
+        
+        // Tatil sil
+        function removeHoliday(index) {
+            if (confirm('Bu tatili silmek istediğinizden emin misiniz?')) {
+                holidays.splice(index, 1);
+                displayHolidays();
+                formChanged = true;
+            }
+        }
+        
+        // Tatil günlerini kaydet 
+        function saveHolidays() {
+            localStorage.setItem('holidays', JSON.stringify(holidays));
+            alert('Tatil günleri kaydedildi!');
+            formChanged = false;
+        }
+        
+        // JSON olarak dışa aktar
+        function exportHolidays() {
+            const jsonData = JSON.stringify(holidays, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // İndirme bağlantısı oluştur
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'holidays.json';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Temizlik
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        // JSON dosyasını içe aktar
+        function importHolidays(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedHolidays = JSON.parse(e.target.result);
+                    
+                    // Geçerli JSON formatı mı kontrol et
+                    if (!Array.isArray(importedHolidays) || !importedHolidays.every(h => 
+                        typeof h === 'object' && 
+                        'month' in h && 
+                        'day' in h && 
+                        'name' in h)) {
+                        throw new Error('Geçersiz JSON formatı');
+                    }
+                    
+                    // İçe aktarılan tatilleri ayarla
+                    holidays = importedHolidays;
+                    displayHolidays();
+                    formChanged = true;
+                    alert('Tatiller başarıyla içe aktarıldı!');
+                } catch (error) {
+                    alert('Hata: Geçersiz JSON dosyası');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+            // Dosya seçiciyi sıfırla (aynı dosyayı tekrar seçmeyi etkinleştirmek için)
+            event.target.value = '';
+        }
+        
+        // Sayfa kapatılmadan önce uyarı
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                const message = 'Kaydedilmemiş değişiklikler var. Sayfadan ayrılmak istediğinize emin misiniz?';
+                e.returnValue = message;
+                return message;
+            }
+        });
+        
+        // Sayfa yüklendiğinde
+        window.onload = function() {
+            loadHolidays();
+            
+            // Input değişiklikleri izle
+            document.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('change', () => formChanged = true);
+                element.addEventListener('input', () => formChanged = true);
+            });
+        };
+    </script>
+</body>
+</html> 
