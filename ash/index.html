@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <label for="monthSelect">Ay Seçin:</label>
-    <select id="monthSelect" onchange="generateCalendar()">
+    <label for="monthSelect">Ay:</label>
+    <select id="monthSelect" onchange="generateCalendar()" style="width: 100px; margin-right: 10px;">
         <option value="1">Ocak</option>
         <option value="2">Şubat</option>
         <option value="3">Mart</option>
@@ -22,6 +22,16 @@
         <option value="10">Ekim</option>
         <option value="11">Kasım</option>
         <option value="12">Aralık</option>
+    </select>
+
+    <label for="yearSelect">Yıl:</label>
+    <select id="yearSelect" onchange="generateCalendar()" style="width: 80px;">
+        <option value="2025" selected>2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
     </select>
 
     <div class="container">
@@ -58,42 +68,11 @@
         </table>
     </div>
     <button onclick="addRow()">Ekle</button>
-    <button onclick="generateOvertimeReport()" class="primary-button">Fazla Mesai Raporu Hazırla</button>
+    <button onclick="generateDailyReport()" class="primary-button">Günlük Çalışma Raporu</button>
+    <button onclick="generateOvertimeReport()" class="primary-button">Fazla Mesai Raporu</button>
     
     <div style="margin-top: 20px;">
         <a href="holidays.html" class="nav-link">Resmi Tatil Yönetimi</a>
-    </div>
-    
-    <div style="margin-top: 20px; max-width: 800px;" id="leaveTypeInfo">
-        <h3>İzin Türleri</h3>
-        <table class="info-table">
-            <thead>
-                <tr>
-                    <th>İzin Türü</th>
-                    <th>Kısa Kod</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>EVLİLİK İZNİ, EĞİTİM İZNİ</td><td>EV - Eİ</td></tr>
-                <tr><td>YILLIK İZİN</td><td>Yİ</td></tr>
-                <tr><td>GÖREVLENDİRME</td><td>GÖ</td></tr>
-                <tr><td>RAPORLU</td><td>R</td></tr>
-                <tr><td>MAZERET İZNİ</td><td>Mİ</td></tr>
-                <tr><td>ÖLÜM İZNİ</td><td>Öİ</td></tr>
-                <tr><td>REFAKAT İZNİ</td><td>Rİ</td></tr>
-                <tr><td>SENDİKA İZNİ</td><td>SEİ</td></tr>
-                <tr><td>ÜCRETSİZ İZİN</td><td>Üİ</td></tr>
-                <tr><td>KONGRE İZNİ</td><td>Kİ</td></tr>
-                <tr><td>İŞ KAZASI</td><td>İK</td></tr>
-                <tr><td>DOĞUM SONU İZNİ</td><td>DSİ</td></tr>
-                <tr><td>DOĞUM ÖNCESİ İZNİ</td><td>DÖİ</td></tr>
-                <tr><td>NÖBET İZNİ</td><td>Nİ</td></tr>
-                <tr><td>İDARİ İZİN</td><td>İDİ</td></tr>
-                <tr><td>HASTANEYE YATIŞ</td><td>HY</td></tr>
-                <tr><td>HAFTA SONU</td><td>HS</td></tr>
-                <tr><td>RESMİ TATİL</td><td>RT</td></tr>
-            </tbody>
-        </table>
     </div>
     
     <!-- İzin tipi seçme kutusu (gizli) -->
@@ -121,30 +100,26 @@
 
     <script>
         let holidays = [];
+        let dailyWorkers = {};
         
-        // Tatil günlerini yükle
         async function loadHolidays() {
             try {
-                // localStorage'dan yükle (holidays.html'de düzenlenmiş olabilir)
                 const savedHolidays = localStorage.getItem('holidays');
                 if (savedHolidays) {
                     holidays = JSON.parse(savedHolidays);
                     return true;
                 }
                 
-                // Yoksa JSON dosyasından yüklemeyi dene
                 const response = await fetch('holidays.json');
                 if (!response.ok) {
                     throw new Error('Tatil günleri yüklenemedi');
                 }
                 holidays = await response.json();
                 
-                // İleride kullanmak üzere localStorage'a kaydet
                 localStorage.setItem('holidays', JSON.stringify(holidays));
                 return true;
             } catch (error) {
                 console.error('Tatil günleri yüklenirken hata oluştu:', error);
-                // Varsayılan tatiller
                 holidays = [
                     { month: 1, day: 1, name: "Yeni Yıl" },
                     { month: 4, day: 23, name: "Ulusal Egemenlik" },
@@ -153,7 +128,6 @@
                     { month: 10, day: 29, name: "Cumhuriyet Bayramı" }
                 ];
                 
-                // Varsayılan tatilleri localStorage'a kaydet
                 localStorage.setItem('holidays', JSON.stringify(holidays));
                 return true;
             }
@@ -175,7 +149,6 @@
             }
         }
 
-        // İzin tipleri
         const leaveTypes = [
             { code: "EV-Eİ", name: "EVLİLİK İZNİ, EĞİTİM İZNİ" },
             { code: "Yİ", name: "YILLIK İZİN" },
@@ -197,7 +170,6 @@
             { code: "RT", name: "RESMİ TATİL" }
         ];
         
-        // İzin seçim menüsünü göster
         function showLeaveSelect(input) {
             const leaveSelect = document.getElementById('leaveTypeSelect');
             const rect = input.getBoundingClientRect();
@@ -206,17 +178,14 @@
             leaveSelect.style.left = rect.left + 'px';
             leaveSelect.style.display = 'block';
             
-            // İzin tipi seçildiğinde
             leaveSelect.querySelectorAll('div').forEach(div => {
                 div.onclick = function() {
                     const code = this.getAttribute('data-code');
                     if (code === 'temizle') {
-                        // İzni temizle
                         input.value = '';
                         input.parentElement.classList.remove('leave-type');
                         input.classList.remove('leave-input');
                     } else {
-                        // İzin kodunu ata
                         input.value = code;
                         input.parentElement.classList.add('leave-type');
                         input.classList.add('leave-input');
@@ -224,15 +193,13 @@
                     
                     leaveSelect.style.display = 'none';
                     calculateOvertime(input.closest('tr'));
-                    trackChanges(); // Değişikliği izle
+                    trackChanges();
                 };
             });
             
-            // Dışarı tıklandığında menüyü kapat
             document.addEventListener('click', closeLeaveSelect);
         }
         
-        // İzin seçim menüsünü kapat
         function closeLeaveSelect(event) {
             const leaveSelect = document.getElementById('leaveTypeSelect');
             if (event && event.target.closest('#leaveTypeSelect')) return;
@@ -241,17 +208,13 @@
         }
 
         function addRow() {
-            // Önce takvimi oluştur (eğer henüz oluşturulmadıysa)
             if (document.querySelector('#personelTable thead tr').children.length <= 7) {
                 generateCalendar();
             }
             
-            // Yeni bir boş satır oluştur
             let table = document.getElementById("personelTable").getElementsByTagName('tbody')[0];
             let newRow = document.createElement('tr');
             
-            // Sabit sütunları oluştur
-            // TC Kimlik No
             let tcCell = document.createElement('td');
             let tcInput = document.createElement('input');
             tcInput.type = 'text';
@@ -260,21 +223,18 @@
             tcCell.appendChild(tcInput);
             newRow.appendChild(tcCell);
             
-            // Ad
             let nameCell = document.createElement('td');
             let nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameCell.appendChild(nameInput);
             newRow.appendChild(nameCell);
             
-            // Soyad
             let surnameCell = document.createElement('td');
             let surnameInput = document.createElement('input');
             surnameInput.type = 'text';
             surnameCell.appendChild(surnameInput);
             newRow.appendChild(surnameCell);
             
-            // Unvan
             let titleCell = document.createElement('td');
             let titleSelect = document.createElement('select');
             let options = ['Tıbbi Sekreter', 'Hemşire', 'Doktor', 'Ebe'];
@@ -287,27 +247,23 @@
             titleCell.appendChild(titleSelect);
             newRow.appendChild(titleCell);
             
-            // Toplam Çalışma
             let totalWorkCell = document.createElement('td');
             totalWorkCell.className = 'total-work-cell';
             totalWorkCell.textContent = '0';
             newRow.appendChild(totalWorkCell);
             
-            // Normal Çalışma
             let normalHoursCell = document.createElement('td');
             normalHoursCell.className = 'normal-hours-cell';
             normalHoursCell.textContent = '0';
             newRow.appendChild(normalHoursCell);
             
-            // Fazla Mesai
             let overtimeCell = document.createElement('td');
             overtimeCell.className = 'overtime-cell';
             overtimeCell.textContent = '0';
             newRow.appendChild(overtimeCell);
             
-            // Günleri ekle
             const month = parseInt(document.getElementById('monthSelect').value);
-            const year = 2025;
+            const year = parseInt(document.getElementById('yearSelect').value);
             const daysInMonth = new Date(year, month, 0).getDate();
             const firstDay = new Date(year, month-1, 1).getDay();
             
@@ -323,7 +279,6 @@
                 input.className = 'hours day-input';
                 input.oninput = () => validateHours(input);
                 
-                // Çift tıklama ile izin giriş penceresi açma
                 input.ondblclick = function(e) {
                     e.preventDefault();
                     showLeaveSelect(this);
@@ -337,73 +292,77 @@
                 currentDay = (currentDay + 1) % 7;
             }
             
-            // Yeni satırı tabloya ekle
             table.appendChild(newRow);
             
-            // Hesaplamaları yap
             calculateOvertime(newRow);
-            trackChanges(); // Değişikliği izle
+            trackChanges();
         }
 
         function calculateOvertime(row) {
             const month = parseInt(document.getElementById('monthSelect').value);
+            const year = parseInt(document.getElementById('yearSelect').value);
             const inputs = row.querySelectorAll('.hours');
             
-            // Toplam çalışma saati
             let totalWorkHours = 0;
             
             inputs.forEach((input, index) => {
                 const day = index + 1;
                 
-                // İzin kontrolü
                 const isLeave = input.classList.contains('leave-input');
                 
-                // Eğer izinde değilse çalışma saatini ekle
                 if (!isLeave) {
                     const hours = parseInt(input.value) || 0;
                     totalWorkHours += hours;
+                    
+                    const dateKey = `${year}-${month}-${day}`;
+                    if (!dailyWorkers[dateKey]) {
+                        dailyWorkers[dateKey] = {};
+                    }
+                    
+                    if (hours > 0) {
+                        const workerKey = `${row.cells[0].querySelector('input').value}-${row.cells[1].querySelector('input').value}-${row.cells[2].querySelector('input').value}`;
+                        dailyWorkers[dateKey][workerKey] = {
+                            hours: hours,
+                            name: `${row.cells[1].querySelector('input').value} ${row.cells[2].querySelector('input').value}`,
+                            title: row.cells[3].querySelector('select').value
+                        };
+                    }
                 }
             });
             
-            // Aylık normal çalışma saatini hesapla
             const normalHours = calculateMonthlyNormalHours(row);
             
-            // Fazla mesai saatini hesapla
             const overtimeHours = Math.max(0, totalWorkHours - normalHours);
             
-            // Değerleri güncelle
             row.querySelector('.total-work-cell').textContent = totalWorkHours;
             row.querySelector('.normal-hours-cell').textContent = normalHours;
             row.querySelector('.overtime-cell').textContent = overtimeHours;
         }
         
-        // Aylık normal çalışma saatini hesaplama
         function calculateMonthlyNormalHours(row) {
             const month = parseInt(document.getElementById('monthSelect').value);
-            const year = 2025;
+            const year = parseInt(document.getElementById('yearSelect').value);
             const daysInMonth = new Date(year, month, 0).getDate();
             const inputs = row.querySelectorAll('.hours');
             
             let normalHours = 0;
             
-            // Ayın tüm günlerini kontrol et
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month-1, day);
-                const dayOfWeek = date.getDay(); // 0=Pazar, 6=Cumartesi
+                const dayOfWeek = date.getDay();
                 
-                // Sadece hafta içi günleri (1-5) hesapla
                 if (dayOfWeek > 0 && dayOfWeek < 6) {
-                    // İndeks 0'dan başladığı için day-1
-                    const input = inputs[day-1];
+                    const isHoliday = holidays.some(h => h.month === month && h.day === day);
                     
-                    // Bu günde izin var mı?
-                    const isLeave = input && input.classList.contains('leave-input');
-                    
-                    // İzin yoksa günlük 8 saat ekle
-                    if (!isLeave) {
-                        normalHours += 8;
+                    if (!isHoliday) {
+                        const input = inputs[day-1];
+                        
+                        const isLeave = input && input.classList.contains('leave-input');
+                        
+                        if (!isLeave) {
+                            normalHours += 8;
+                        }
                     }
-                    // İzin varsa 0 ekle (yani hesaba katma)
                 }
             }
             
@@ -411,23 +370,21 @@
         }
 
         function validateHours(input) {
-            // Sayısal değer kontrolü ve sınırlama
             if (!input.classList.contains('leave-input')) {
                 let value = parseInt(input.value) || 0;
                 if(value < 0) input.value = 0;
                 if(value > 24) input.value = 24;
             }
             calculateOvertime(input.closest('tr'));
-            trackChanges(); // Değişikliği izle
+            trackChanges();
         }
 
         function generateCalendar() {
             const month = parseInt(document.getElementById('monthSelect').value);
-            const year = 2025;
+            const year = parseInt(document.getElementById('yearSelect').value);
             const daysInMonth = new Date(year, month, 0).getDate();
             const firstDay = new Date(year, month-1, 1).getDay();
 
-            // Başlıkları güncelle
             const thead = document.querySelector('#personelTable thead tr');
             while(thead.children.length > 7) thead.removeChild(thead.lastChild);
             for(let i=1; i<=daysInMonth; i++) {
@@ -437,16 +394,13 @@
                 thead.appendChild(th);
             }
 
-            // Hücreleri yeniden oluştur
             document.querySelectorAll('#personelTable tbody tr').forEach(row => {
-                // Mevcut mesai değerlerini ve izin kodlarını sakla
                 const existingInputValues = [];
                 const existingLeaveData = [];
                 
                 row.querySelectorAll('.hours').forEach(input => {
                     existingInputValues.push(input.value);
                     
-                    // İzin bilgisini sakla
                     if (input.classList.contains('leave-input')) {
                         existingLeaveData.push({
                             index: existingInputValues.length - 1,
@@ -455,7 +409,6 @@
                     }
                 });
                 
-                // Önce sabit sütunları geçici olarak sakla
                 const tcCol = row.children[0].cloneNode(true);
                 const nameCol = row.children[1].cloneNode(true);
                 const surnameCol = row.children[2].cloneNode(true);
@@ -464,12 +417,10 @@
                 const normalHoursCol = row.children[5].cloneNode(true);
                 const overtimeCol = row.children[6].cloneNode(true);
                 
-                // Tüm sütunları temizle
                 while(row.children.length > 0) {
                     row.removeChild(row.children[0]);
                 }
                 
-                // Sabit sütunları geri ekle
                 row.appendChild(tcCol);
                 row.appendChild(nameCol);
                 row.appendChild(surnameCol);
@@ -478,7 +429,6 @@
                 row.appendChild(normalHoursCol);
                 row.appendChild(overtimeCol);
                 
-                // Günleri ekle
                 let currentDay = firstDay;
                 for(let day=1; day<=daysInMonth; day++) {
                     const td = document.createElement('td');
@@ -488,7 +438,6 @@
                     input.min = 0;
                     input.max = 24;
                     
-                    // Mevcut değeri koru veya 0 ata
                     if (existingInputValues.length > day-1) {
                         input.value = existingInputValues[day-1];
                     } else {
@@ -498,7 +447,6 @@
                     input.className = 'hours day-input';
                     input.oninput = () => validateHours(input);
                     
-                    // Çift tıklama ile izin giriş penceresi açma
                     input.ondblclick = function(e) {
                         e.preventDefault();
                         showLeaveSelect(this);
@@ -507,7 +455,6 @@
                     if(currentDay === 0 || currentDay === 6) td.classList.add('weekend');
                     if(holidays.some(h => h.month === month && h.day === day)) td.classList.add('holiday');
                     
-                    // İzin bilgisini varsa geri yükle
                     const existingLeave = existingLeaveData.find(l => l.index === day-1);
                     if (existingLeave) {
                         input.value = existingLeave.code;
@@ -520,44 +467,35 @@
                     currentDay = (currentDay + 1) % 7;
                 }
                 
-                // TC Kimlik doğrulama olayını yeniden bağla
                 const tcInput = row.querySelector('.tcNo');
                 if (tcInput) {
                     tcInput.onblur = () => validateTC(tcInput);
                 }
                 
-                // Hesaplamaları yap
                 calculateOvertime(row);
             });
         }
 
-        // Form verileri değişti mi (sayfa kapatma kontrolü için)
         let formChanged = false;
         
-        // Input değişikliğini izle
         function trackChanges() {
             formChanged = true;
         }
         
-        // Sayfa yüklendiğinde değişiklik izlemeyi başlat
         function setupChangeTracking() {
-            // Tüm input ve select elementlerini izle
             document.querySelectorAll('input, select').forEach(element => {
                 element.addEventListener('change', trackChanges);
                 element.addEventListener('input', trackChanges);
             });
             
-            // Ekle ve Tatil Ekle butonlarına tıklanınca değişiklik olarak işaretle
             document.querySelectorAll('button').forEach(button => {
                 if (button.innerHTML === 'Ekle' || button.innerHTML === 'Tatil Ekle') {
                     button.addEventListener('click', trackChanges);
                 }
             });
             
-            // Sayfa kapatıldığında veya yenilendiğinde uyarı göster
             window.addEventListener('beforeunload', function(e) {
                 if (formChanged) {
-                    // Standart mesaj (tarayıcıya göre değişebilir)
                     const message = 'Formdaki değişiklikler kaydedilmeyecek. Sayfadan ayrılmak istediğinize emin misiniz?';
                     e.returnValue = message;
                     return message;
@@ -565,7 +503,84 @@
             });
         }
 
-        // Fazla mesai raporu oluştur
+        function generateDailyReport() {
+            const table = document.getElementById('personelTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            if (rows.length === 0) {
+                alert('Personel kaydı bulunamadı!');
+                return;
+            }
+            
+            const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
+            const monthName = monthSelect.options[monthSelect.selectedIndex].text;
+            const year = yearSelect.value;
+            const month = parseInt(monthSelect.value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            const excelData = [];
+            
+            excelData.push(["Tarih", "8 Saat Çalışanlar", "16 Saat Çalışanlar", "24 Saat Çalışanlar"]);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${year}-${month}-${day}`;
+                const workers = dailyWorkers[dateKey] || {};
+                
+                const workers8 = [];
+                const workers16 = [];
+                const workers24 = [];
+                
+                Object.values(workers).forEach(worker => {
+                    const workerInfo = `${worker.name} (${worker.title})`;
+                    if (worker.hours === 8) {
+                        workers8.push(workerInfo);
+                    } else if (worker.hours === 16) {
+                        workers16.push(workerInfo);
+                    } else if (worker.hours === 24) {
+                        workers24.push(workerInfo);
+                    }
+                });
+                
+                excelData.push([
+                    `${day}/${month}/${year}`,
+                    workers8.join('\n'),
+                    workers16.join('\n'),
+                    workers24.join('\n')
+                ]);
+            }
+            
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+            
+            const columns = [
+                { wch: 15 },
+                { wch: 40 },
+                { wch: 40 },
+                { wch: 40 },
+            ];
+            worksheet['!cols'] = columns;
+            
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cell_address = {c: C, r: R};
+                    const cell_ref = XLSX.utils.encode_cell(cell_address);
+                    if (!worksheet[cell_ref]) continue;
+                    worksheet[cell_ref].s = {
+                        alignment: {
+                            wrapText: true,
+                            vertical: 'top'
+                        }
+                    };
+                }
+            }
+            
+            XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
+            
+            XLSX.writeFile(workbook, `Gunluk_Calisma_Raporu_${monthName}_${year}.xlsx`);
+        }
+
         function generateOvertimeReport() {
             const table = document.getElementById('personelTable');
             const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -575,66 +590,90 @@
                 return;
             }
             
-            // Aktif ayı al
             const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
             const monthName = monthSelect.options[monthSelect.selectedIndex].text;
-            const year = 2025;
+            const year = yearSelect.value;
             
-            // Excel verileri için dizi oluştur
             const excelData = [];
             
-            // Başlık satırı
             excelData.push(["TC Kimlik No", "Adı", "Soyadı", "Unvan", "Toplam Çalışma", "Normal Çalışma", "Fazla Mesai"]);
             
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 
-                // Personel bilgilerini al
-                const tcNo = row.cells[0].querySelector('input').value;
-                const firstName = row.cells[1].querySelector('input').value;
-                const lastName = row.cells[2].querySelector('input').value;
-                const title = row.cells[3].querySelector('select').value;
+                const tcInput = row.cells[0].querySelector('input');
+                const firstNameInput = row.cells[1].querySelector('input');
+                const lastNameInput = row.cells[2].querySelector('input');
+                const titleSelect = row.cells[3].querySelector('select');
                 
-                // Mesai bilgilerini al
+                if (!tcInput || !firstNameInput || !lastNameInput || !titleSelect) continue;
+                
+                const tcNo = tcInput.value;
+                const firstName = firstNameInput.value;
+                const lastName = lastNameInput.value;
+                const title = titleSelect.value;
+                
                 const totalWork = row.cells[4].textContent;
                 const normalHours = row.cells[5].textContent;
                 const overtime = row.cells[6].textContent;
                 
-                // Boş kayıtları kontrol et
                 if (!tcNo || !firstName || !lastName) continue;
                 
-                // Excel satırı ekle
-                excelData.push([tcNo, firstName, lastName, title, totalWork, normalHours, overtime]);
+                console.log('Satır Verileri:', {
+                    tcNo,
+                    firstName,
+                    lastName,
+                    title,
+                    totalWork,
+                    normalHours,
+                    overtime
+                });
+                
+                excelData.push([
+                    tcNo,
+                    firstName,
+                    lastName,
+                    title,
+                    totalWork,
+                    normalHours,
+                    overtime
+                ]);
             }
             
-            // Excel çalışma kitabı oluştur
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+            console.log('Tüm Excel Verileri:', excelData);
             
-            // Sütun genişliklerini ayarla
-            const columns = [
-                { wch: 15 },  // TC Kimlik No
-                { wch: 15 },  // Adı
-                { wch: 15 },  // Soyadı
-                { wch: 15 },  // Unvan
-                { wch: 15 },  // Toplam Çalışma
-                { wch: 15 },  // Normal Çalışma
-                { wch: 15 },  // Fazla Mesai
-            ];
-            worksheet['!cols'] = columns;
-            
-            // Çalışma sayfasını çalışma kitabına ekle
-            XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
-            
-            // Dosyayı indir
-            XLSX.writeFile(workbook, `Fazla_Mesai_Raporu_${monthName}_${year}.xlsx`);
+            try {
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+                
+                const columns = [
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                ];
+                worksheet['!cols'] = columns;
+                
+                XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
+                
+                XLSX.writeFile(workbook, `Fazla_Mesai_Raporu_${monthName}_${year}.xlsx`);
+                
+                console.log('Excel dosyası başarıyla oluşturuldu');
+            } catch (error) {
+                console.error('Excel oluşturma hatası:', error);
+                alert('Excel dosyası oluşturulurken bir hata oluştu: ' + error.message);
+            }
         }
 
         window.onload = async function() {
             await loadHolidays();
             generateCalendar();
-            setupChangeTracking(); // Değişiklik izlemeyi başlat
-            formChanged = false; // Başlangıçta değişiklik yok
+            setupChangeTracking();
+            formChanged = false;
         };
     </script>
 </body>

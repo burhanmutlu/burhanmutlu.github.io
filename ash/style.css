@@ -1,155 +1,232 @@
-.container { overflow-x: auto; }
-table { min-width: 1200px; border-collapse: collapse; }
-th, td { border: 1px solid black; padding: 0; text-align: center; }
-select, input { width: 100%; min-width: 80px; }
-.weekend { background-color: red; color: white; }
-.weekend input { background-color: red; color: white; }
-.holiday { background-color: purple; color: white; }
-.holiday input { background-color: purple; color: white; }
-.mesai-cell { background-color: #e6e6e6; min-width: 100px; }
-.monthly-hours-cell { background-color: #e6e6e6; min-width: 100px; }
-.monthly-overtime-cell { background-color: #e6e6e6; min-width: 100px; }
-.total-work-cell { background-color: #e6e6e6; min-width: 100px; }
-.normal-hours-cell { background-color: #e6e6e6; min-width: 100px; }
-.overtime-cell { background-color: #e6e6e6; min-width: 100px; }
-.fixed-column { min-width: 120px; }
-.day-column { min-width: 28px; }
-.day-input { min-width: 28px; }
-.leave-type { background-color: #ffeb3b; color: black; }
-.leave-input { background-color: #ffeb3b; color: black; }
+/* Genel Stiller */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f2f5;
+    color: #2c3e50;
+}
+
+/* Container ve Tablo Stilleri */
+.container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin: 20px 0;
+    padding: 20px;
+}
+
+table {
+    min-width: 1200px;
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+}
+
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background-color: #e9ecef;
+    font-weight: 600;
+    color: #212529;
+}
+
+/* Input ve Select Stilleri */
+select, input {
+    width: 100%;
+    min-width: 80px;
+    padding: 8px;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+}
+
+/* Özel Hücre Stilleri */
+.weekend {
+    background-color: #ffe3e3;
+    color: #c92a2a;
+}
+
+.weekend input {
+    background-color: #ffe3e3;
+    color: #c92a2a;
+}
+
+.holiday {
+    background-color: #f3d9fa;
+    color: #862e9c;
+}
+
+.holiday input {
+    background-color: #f3d9fa;
+    color: #862e9c;
+}
+
+.mesai-cell, .monthly-hours-cell, .monthly-overtime-cell,
+.total-work-cell, .normal-hours-cell, .overtime-cell {
+    background-color: #e9ecef;
+    min-width: 100px;
+    font-weight: 600;
+}
+
+.fixed-column {
+    min-width: 120px;
+    position: sticky;
+    left: 0;
+    background-color: #e9ecef;
+    z-index: 1;
+}
+
+.day-column {
+    min-width: 28px;
+}
+
+.day-input {
+    min-width: 28px;
+    text-align: center;
+}
+
+/* İzin Stilleri */
+.leave-type {
+    background-color: #fff3bf;
+    color: #5f3dc4;
+}
+
+.leave-input {
+    background-color: #fff3bf;
+    color: #5f3dc4;
+}
+
+/* İzin Seçim Menüsü */
 .leave-select {
     position: absolute;
     background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 1px solid #ced4da;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     z-index: 100;
-    width: 200px;
+    width: 250px;
     display: none;
     max-height: 300px;
     overflow-y: auto;
-}
-.leave-select div {
-    padding: 8px;
-    cursor: pointer;
-}
-.leave-select div:hover {
-    background-color: #f2f2f2;
+    border-radius: 4px;
 }
 
-/* Butonlar için stil */
+.leave-select div {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.leave-select div:hover {
+    background-color: #e9ecef;
+}
+
+/* Buton Stilleri */
 button {
-    padding: 8px 16px;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 5px;
+    margin-right: 10px;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
 .primary-button {
-    background-color: #4CAF50;
+    background-color: #2ecc71;
     color: white;
 }
 
 .primary-button:hover {
-    background-color: #45a049;
+    background-color: #27ae60;
+    transform: translateY(-1px);
 }
 
+/* Navigasyon Linkleri */
 .nav-link {
-    padding: 8px 16px;
-    background-color: #4CAF50;
+    padding: 10px 20px;
+    background-color: #2ecc71;
     color: white;
     text-decoration: none;
     border-radius: 4px;
     display: inline-block;
     margin-top: 20px;
+    transition: all 0.2s;
 }
 
-/* İzin türleri tablosu */
+.nav-link:hover {
+    background-color: #27ae60;
+    transform: translateY(-1px);
+}
+
+/* İzin Türleri Tablosu */
 .info-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-}
-
-.info-table th, .info-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .info-table th {
-    background-color: #f2f2f2;
+    background-color: #2ecc71;
+    color: white;
+    padding: 12px;
 }
 
-/* holidays.html için CSS kodları */
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    max-width: 800px;
+.info-table td {
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
 }
-.form-group {
+
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Ay Seçici Stili */
+#monthSelect {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #2ecc71;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+/* Başlık Stilleri */
+h3 {
+    color: #2ecc71;
     margin-bottom: 15px;
-}
-label {
-    display: inline-block;
-    width: 100px;
-}
-.delete-btn {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-.nav-button {
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-    border-radius: 4px;
+    font-size: 18px;
 }
 
-/* holidays.html için tabloyla ilgili CSS kodları */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-th {
-    background-color: #f2f2f2;
-}
-
-/* Butonlar için genel stil */
-button {
-    padding: 5px 15px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-/* Primary button stil */
-.primary-button {
-    margin-left: 10px;
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Navigation link stil */
-.nav-link {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    display: inline-block;
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    button, .nav-link {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 } 
