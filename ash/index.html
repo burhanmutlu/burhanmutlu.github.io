@@ -6,428 +6,317 @@
     <title>Personel Takip</title>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+        .nav-menu {
+            background-color: #333;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .nav-menu ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .nav-menu li {
+            display: inline;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-menu a:hover {
+            background-color: #555;
+        }
+        .nav-menu a.active {
+            background-color: #4CAF50;
+        }
+        .main-content {
+            margin: 0 auto;
+            padding: 0 5px;
+        }
+    </style>
 </head>
 <body>
-    <label for="monthSelect">Ay:</label>
-    <select id="monthSelect" onchange="generateCalendar()" style="width: 100px; margin-right: 10px;">
-        <option value="1">Ocak</option>
-        <option value="2">Şubat</option>
-        <option value="3">Mart</option>
-        <option value="4">Nisan</option>
-        <option value="5">Mayıs</option>
-        <option value="6">Haziran</option>
-        <option value="7">Temmuz</option>
-        <option value="8">Ağustos</option>
-        <option value="9">Eylül</option>
-        <option value="10">Ekim</option>
-        <option value="11">Kasım</option>
-        <option value="12">Aralık</option>
-    </select>
+    <div id="menu-container"></div>
+    <div class="main-content">
+        <script>
+            fetch('menu.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('menu-container').innerHTML = data;
+                });
+        </script>
+        <label for="monthSelect">Ay:</label>
+        <select id="monthSelect" onchange="generateCalendar()" style="width: 100px; margin-right: 10px;">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select>
 
-    <label for="yearSelect">Yıl:</label>
-    <select id="yearSelect" onchange="generateCalendar()" style="width: 80px;">
-        <option value="2025" selected>2025</option>
-        <option value="2026">2026</option>
-        <option value="2027">2027</option>
-        <option value="2028">2028</option>
-        <option value="2029">2029</option>
-        <option value="2030">2030</option>
-    </select>
+        <label for="yearSelect">Yıl:</label>
+        <select id="yearSelect" onchange="generateCalendar()" style="width: 80px;">
+            <option value="2025" selected>2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+        </select>
 
-    <div class="container">
-        <table id="personelTable">
-            <thead>
-                <tr>
-                    <th class="fixed-column">T.C. Kimlik No</th>
-                    <th class="fixed-column">Adı</th>
-                    <th class="fixed-column">Soyadı</th>
-                    <th class="fixed-column">Unvan</th>
-                    <th class="fixed-column">Toplam Çalışma</th>
-                    <th class="fixed-column">Norm. Çalışma</th>
-                    <th class="fixed-column">Fazla Mesai</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="text" class="tcNo" onblur="validateTC(this)"></td>
-                    <td><input type="text"></td>
-                    <td><input type="text"></td>
-                    <td>
-                        <select>
-                            <option value="Tıbbi Sekreter">Tıbbi Sekreter</option>
-                            <option value="Hemşire">Hemşire</option>
-                            <option value="Doktor">Doktor</option>
-                            <option value="Ebe">Ebe</option>
-                        </select>
-                    </td>
-                    <td class="total-work-cell">0</td>
-                    <td class="normal-hours-cell">0</td>
-                    <td class="overtime-cell">0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <button onclick="addRow()">Ekle</button>
-    <button onclick="generateDailyReport()" class="primary-button">Günlük Çalışma Raporu</button>
-    <button onclick="generateOvertimeReport()" class="primary-button">Fazla Mesai Raporu</button>
-    
-    <div style="margin-top: 20px;">
-        <a href="holidays.html" class="nav-link">Resmi Tatil Yönetimi</a>
-    </div>
-    
-    <!-- İzin tipi seçme kutusu (gizli) -->
-    <div class="leave-select" id="leaveTypeSelect">
-        <div data-code="EV-Eİ">EVLİLİK İZNİ, EĞİTİM İZNİ (EV-Eİ)</div>
-        <div data-code="Yİ">YILLIK İZİN (Yİ)</div>
-        <div data-code="GÖ">GÖREVLENDİRME (GÖ)</div>
-        <div data-code="R">RAPORLU (R)</div>
-        <div data-code="Mİ">MAZERET İZNİ (Mİ)</div>
-        <div data-code="Öİ">ÖLÜM İZNİ (Öİ)</div>
-        <div data-code="Rİ">REFAKAT İZNİ (Rİ)</div>
-        <div data-code="SEİ">SENDİKA İZNİ (SEİ)</div>
-        <div data-code="Üİ">ÜCRETSİZ İZİN (Üİ)</div>
-        <div data-code="Kİ">KONGRE İZNİ (Kİ)</div>
-        <div data-code="İK">İŞ KAZASI (İK)</div>
-        <div data-code="DSİ">DOĞUM SONU İZNİ (DSİ)</div>
-        <div data-code="DÖİ">DOĞUM ÖNCESİ İZNİ (DÖİ)</div>
-        <div data-code="Nİ">NÖBET İZNİ (Nİ)</div>
-        <div data-code="İDİ">İDARİ İZİN (İDİ)</div>
-        <div data-code="HY">HASTANEYE YATIŞ (HY)</div>
-        <div data-code="HS">HAFTA SONU (HS)</div>
-        <div data-code="RT">RESMİ TATİL (RT)</div>
-        <div data-code="temizle">[ İzni Temizle ]</div>
-    </div>
-
-    <script>
-        let holidays = [];
-        let dailyWorkers = {};
+        <div class="container">
+            <table id="personelTable">
+                <thead>
+                    <tr>
+                        <th class="fixed-column">T.C. Kimlik No</th>
+                        <th class="fixed-column">Adı</th>
+                        <th class="fixed-column">Soyadı</th>
+                        <th class="fixed-column">Unvan</th>
+                        <th class="fixed-column">Toplam Çalışma</th>
+                        <th class="fixed-column">Norm. Çalışma</th>
+                        <th class="fixed-column">Fazla Mesai</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="tcNo" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onblur="validateTC(this)" maxlength="11" placeholder="TC"></td>
+                        <td><input type="text" placeholder="Ad"></td>
+                        <td><input type="text" placeholder="Soyad"></td>
+                        <td>
+                            <select>
+                                <option value="Tıbbi Sekreter">Tıbbi Sekreter</option>
+                                <option value="Hemşire">Hemşire</option>
+                                <option value="Doktor">Doktor</option>
+                                <option value="Ebe">Ebe</option>
+                            </select>
+                        </td>
+                        <td class="total-work-cell">0</td>
+                        <td class="normal-hours-cell">0</td>
+                        <td class="overtime-cell">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button onclick="addRow()" class="primary-button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px 0; transition: background-color 0.3s;">Ekle</button>
         
-        async function loadHolidays() {
-            try {
-                const savedHolidays = localStorage.getItem('holidays');
-                if (savedHolidays) {
-                    holidays = JSON.parse(savedHolidays);
+        <div style="margin-top: 20px;">
+            <a href="holidays.html" class="nav-link">Resmi Tatil Yönetimi</a>
+        </div>
+        
+        <!-- İzin tipi seçme kutusu (gizli) -->
+        <div class="leave-select" id="leaveTypeSelect">
+            <div data-code="EV-Eİ">EVLİLİK İZNİ, EĞİTİM İZNİ (EV-Eİ)</div>
+            <div data-code="Yİ">YILLIK İZİN (Yİ)</div>
+            <div data-code="GÖ">GÖREVLENDİRME (GÖ)</div>
+            <div data-code="R">RAPORLU (R)</div>
+            <div data-code="Mİ">MAZERET İZNİ (Mİ)</div>
+            <div data-code="Öİ">ÖLÜM İZNİ (Öİ)</div>
+            <div data-code="Rİ">REFAKAT İZNİ (Rİ)</div>
+            <div data-code="SEİ">SENDİKA İZNİ (SEİ)</div>
+            <div data-code="Üİ">ÜCRETSİZ İZİN (Üİ)</div>
+            <div data-code="Kİ">KONGRE İZNİ (Kİ)</div>
+            <div data-code="İK">İŞ KAZASI (İK)</div>
+            <div data-code="DSİ">DOĞUM SONU İZNİ (DSİ)</div>
+            <div data-code="DÖİ">DOĞUM ÖNCESİ İZNİ (DÖİ)</div>
+            <div data-code="Nİ">NÖBET İZNİ (Nİ)</div>
+            <div data-code="İDİ">İDARİ İZİN (İDİ)</div>
+            <div data-code="HY">HASTANEYE YATIŞ (HY)</div>
+            <div data-code="HS">HAFTA SONU (HS)</div>
+            <div data-code="RT">RESMİ TATİL (RT)</div>
+            <div data-code="temizle">[ İzni Temizle ]</div>
+        </div>
+
+        <script>
+            let holidays = [];
+            let dailyWorkers = {};
+            
+            async function loadHolidays() {
+                try {
+                    console.log('Tatil günleri yükleniyor...');
+                    const response = await fetch(window.location.href.replace('index.html', 'holidays.json'));
+                    console.log('Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Yüklenen tatiller:', data);
+                    
+                    if (!Array.isArray(data)) {
+                        throw new Error('JSON dosyası geçerli bir dizi içermiyor');
+                    }
+                    
+                    holidays = data;
                     return true;
+                } catch (error) {
+                    console.error('Tatil günleri yüklenirken hata oluştu:', error);
+                    alert('Tatil günleri yüklenemedi. Lütfen holidays.json dosyasının doğru konumda olduğundan emin olun.\nHata: ' + error.message);
+                    holidays = [];
+                    return false;
                 }
-                
-                const response = await fetch('holidays.json');
-                if (!response.ok) {
-                    throw new Error('Tatil günleri yüklenemedi');
+            }
+            
+            function validateTC(input) {
+                let tc = input.value;
+                let digits = tc.split('').map(Number);
+                let check10 = ((digits[0] + digits[2] + digits[4] + digits[6] + digits[8]) * 7 - (digits[1] + digits[3] + digits[5] + digits[7])) % 10;
+                let check11 = (digits.slice(0, 10).reduce((a, b) => a + b, 0)) % 10;
+                if (digits[9] !== check10 || digits[10] !== check11) {
+                    alert("Geçersiz T.C. Kimlik No!");
+                    input.value = "";
                 }
-                holidays = await response.json();
-                
-                localStorage.setItem('holidays', JSON.stringify(holidays));
-                return true;
-            } catch (error) {
-                console.error('Tatil günleri yüklenirken hata oluştu:', error);
-                holidays = [
-                    { month: 1, day: 1, name: "Yeni Yıl" },
-                    { month: 4, day: 23, name: "Ulusal Egemenlik" },
-                    { month: 5, day: 1, name: "İşçi Bayramı" },
-                    { month: 8, day: 30, name: "Zafer Bayramı" },
-                    { month: 10, day: 29, name: "Cumhuriyet Bayramı" }
-                ];
-                
-                localStorage.setItem('holidays', JSON.stringify(holidays));
-                return true;
             }
-        }
-        
-        function validateTC(input) {
-            let tc = input.value;
-            if (tc.length !== 11 || isNaN(tc)) {
-                alert("Geçersiz T.C. Kimlik No!");
-                input.value = "";
-                return;
-            }
-            let digits = tc.split('').map(Number);
-            let check10 = ((digits[0] + digits[2] + digits[4] + digits[6] + digits[8]) * 7 - (digits[1] + digits[3] + digits[5] + digits[7])) % 10;
-            let check11 = (digits.slice(0, 10).reduce((a, b) => a + b, 0)) % 10;
-            if (digits[9] !== check10 || digits[10] !== check11) {
-                alert("Geçersiz T.C. Kimlik No!");
-                input.value = "";
-            }
-        }
 
-        const leaveTypes = [
-            { code: "EV-Eİ", name: "EVLİLİK İZNİ, EĞİTİM İZNİ" },
-            { code: "Yİ", name: "YILLIK İZİN" },
-            { code: "GÖ", name: "GÖREVLENDİRME" },
-            { code: "R", name: "RAPORLU" },
-            { code: "Mİ", name: "MAZERET İZNİ" },
-            { code: "Öİ", name: "ÖLÜM İZNİ" },
-            { code: "Rİ", name: "REFAKAT İZNİ" },
-            { code: "SEİ", name: "SENDİKA İZNİ" },
-            { code: "Üİ", name: "ÜCRETSİZ İZİN" },
-            { code: "Kİ", name: "KONGRE İZNİ" },
-            { code: "İK", name: "İŞ KAZASI" },
-            { code: "DSİ", name: "DOĞUM SONU İZNİ" },
-            { code: "DÖİ", name: "DOĞUM ÖNCESİ İZNİ" },
-            { code: "Nİ", name: "NÖBET İZNİ" },
-            { code: "İDİ", name: "İDARİ İZİN" },
-            { code: "HY", name: "HASTANEYE YATIŞ" },
-            { code: "HS", name: "HAFTA SONU" },
-            { code: "RT", name: "RESMİ TATİL" }
-        ];
-        
-        function showLeaveSelect(input) {
-            const leaveSelect = document.getElementById('leaveTypeSelect');
-            const rect = input.getBoundingClientRect();
+            const leaveTypes = [
+                { code: "EV-Eİ", name: "EVLİLİK İZNİ, EĞİTİM İZNİ" },
+                { code: "Yİ", name: "YILLIK İZİN" },
+                { code: "GÖ", name: "GÖREVLENDİRME" },
+                { code: "R", name: "RAPORLU" },
+                { code: "Mİ", name: "MAZERET İZNİ" },
+                { code: "Öİ", name: "ÖLÜM İZNİ" },
+                { code: "Rİ", name: "REFAKAT İZNİ" },
+                { code: "SEİ", name: "SENDİKA İZNİ" },
+                { code: "Üİ", name: "ÜCRETSİZ İZİN" },
+                { code: "Kİ", name: "KONGRE İZNİ" },
+                { code: "İK", name: "İŞ KAZASI" },
+                { code: "DSİ", name: "DOĞUM SONU İZNİ" },
+                { code: "DÖİ", name: "DOĞUM ÖNCESİ İZNİ" },
+                { code: "Nİ", name: "NÖBET İZNİ" },
+                { code: "İDİ", name: "İDARİ İZİN" },
+                { code: "HY", name: "HASTANEYE YATIŞ" },
+                { code: "HS", name: "HAFTA SONU" },
+                { code: "RT", name: "RESMİ TATİL" }
+            ];
             
-            leaveSelect.style.top = (rect.bottom + window.scrollY) + 'px';
-            leaveSelect.style.left = rect.left + 'px';
-            leaveSelect.style.display = 'block';
-            
-            leaveSelect.querySelectorAll('div').forEach(div => {
-                div.onclick = function() {
-                    const code = this.getAttribute('data-code');
-                    if (code === 'temizle') {
-                        input.value = '';
-                        input.parentElement.classList.remove('leave-type');
-                        input.classList.remove('leave-input');
-                    } else {
-                        input.value = code;
-                        input.parentElement.classList.add('leave-type');
-                        input.classList.add('leave-input');
-                    }
-                    
-                    leaveSelect.style.display = 'none';
-                    calculateOvertime(input.closest('tr'));
-                    trackChanges();
-                };
-            });
-            
-            document.addEventListener('click', closeLeaveSelect);
-        }
-        
-        function closeLeaveSelect(event) {
-            const leaveSelect = document.getElementById('leaveTypeSelect');
-            if (event && event.target.closest('#leaveTypeSelect')) return;
-            leaveSelect.style.display = 'none';
-            document.removeEventListener('click', closeLeaveSelect);
-        }
-
-        function addRow() {
-            if (document.querySelector('#personelTable thead tr').children.length <= 7) {
-                generateCalendar();
-            }
-            
-            let table = document.getElementById("personelTable").getElementsByTagName('tbody')[0];
-            let newRow = document.createElement('tr');
-            
-            let tcCell = document.createElement('td');
-            let tcInput = document.createElement('input');
-            tcInput.type = 'text';
-            tcInput.className = 'tcNo';
-            tcInput.onblur = () => validateTC(tcInput);
-            tcCell.appendChild(tcInput);
-            newRow.appendChild(tcCell);
-            
-            let nameCell = document.createElement('td');
-            let nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameCell.appendChild(nameInput);
-            newRow.appendChild(nameCell);
-            
-            let surnameCell = document.createElement('td');
-            let surnameInput = document.createElement('input');
-            surnameInput.type = 'text';
-            surnameCell.appendChild(surnameInput);
-            newRow.appendChild(surnameCell);
-            
-            let titleCell = document.createElement('td');
-            let titleSelect = document.createElement('select');
-            let options = ['Tıbbi Sekreter', 'Hemşire', 'Doktor', 'Ebe'];
-            options.forEach(option => {
-                let optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                titleSelect.appendChild(optionElement);
-            });
-            titleCell.appendChild(titleSelect);
-            newRow.appendChild(titleCell);
-            
-            let totalWorkCell = document.createElement('td');
-            totalWorkCell.className = 'total-work-cell';
-            totalWorkCell.textContent = '0';
-            newRow.appendChild(totalWorkCell);
-            
-            let normalHoursCell = document.createElement('td');
-            normalHoursCell.className = 'normal-hours-cell';
-            normalHoursCell.textContent = '0';
-            newRow.appendChild(normalHoursCell);
-            
-            let overtimeCell = document.createElement('td');
-            overtimeCell.className = 'overtime-cell';
-            overtimeCell.textContent = '0';
-            newRow.appendChild(overtimeCell);
-            
-            const month = parseInt(document.getElementById('monthSelect').value);
-            const year = parseInt(document.getElementById('yearSelect').value);
-            const daysInMonth = new Date(year, month, 0).getDate();
-            const firstDay = new Date(year, month-1, 1).getDay();
-            
-            let currentDay = firstDay;
-            for(let day=1; day<=daysInMonth; day++) {
-                const td = document.createElement('td');
-                td.className = 'day-column';
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.min = 0;
-                input.max = 24;
-                input.value = 0;
-                input.className = 'hours day-input';
-                input.oninput = () => validateHours(input);
+            function showLeaveSelect(input) {
+                const leaveSelect = document.getElementById('leaveTypeSelect');
+                const rect = input.getBoundingClientRect();
                 
-                input.ondblclick = function(e) {
-                    e.preventDefault();
-                    showLeaveSelect(this);
-                };
-
-                if(currentDay === 0 || currentDay === 6) td.classList.add('weekend');
-                if(holidays.some(h => h.month === month && h.day === day)) td.classList.add('holiday');
+                leaveSelect.style.top = (rect.bottom + window.scrollY) + 'px';
+                leaveSelect.style.left = rect.left + 'px';
+                leaveSelect.style.display = 'block';
                 
-                td.appendChild(input);
-                newRow.appendChild(td);
-                currentDay = (currentDay + 1) % 7;
-            }
-            
-            table.appendChild(newRow);
-            
-            calculateOvertime(newRow);
-            trackChanges();
-        }
-
-        function calculateOvertime(row) {
-            const month = parseInt(document.getElementById('monthSelect').value);
-            const year = parseInt(document.getElementById('yearSelect').value);
-            const inputs = row.querySelectorAll('.hours');
-            
-            let totalWorkHours = 0;
-            
-            inputs.forEach((input, index) => {
-                const day = index + 1;
-                
-                const isLeave = input.classList.contains('leave-input');
-                
-                if (!isLeave) {
-                    const hours = parseInt(input.value) || 0;
-                    totalWorkHours += hours;
-                    
-                    const dateKey = `${year}-${month}-${day}`;
-                    if (!dailyWorkers[dateKey]) {
-                        dailyWorkers[dateKey] = {};
-                    }
-                    
-                    if (hours > 0) {
-                        const workerKey = `${row.cells[0].querySelector('input').value}-${row.cells[1].querySelector('input').value}-${row.cells[2].querySelector('input').value}`;
-                        dailyWorkers[dateKey][workerKey] = {
-                            hours: hours,
-                            name: `${row.cells[1].querySelector('input').value} ${row.cells[2].querySelector('input').value}`,
-                            title: row.cells[3].querySelector('select').value
-                        };
-                    }
-                }
-            });
-            
-            const normalHours = calculateMonthlyNormalHours(row);
-            
-            const overtimeHours = Math.max(0, totalWorkHours - normalHours);
-            
-            row.querySelector('.total-work-cell').textContent = totalWorkHours;
-            row.querySelector('.normal-hours-cell').textContent = normalHours;
-            row.querySelector('.overtime-cell').textContent = overtimeHours;
-        }
-        
-        function calculateMonthlyNormalHours(row) {
-            const month = parseInt(document.getElementById('monthSelect').value);
-            const year = parseInt(document.getElementById('yearSelect').value);
-            const daysInMonth = new Date(year, month, 0).getDate();
-            const inputs = row.querySelectorAll('.hours');
-            
-            let normalHours = 0;
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month-1, day);
-                const dayOfWeek = date.getDay();
-                
-                if (dayOfWeek > 0 && dayOfWeek < 6) {
-                    const isHoliday = holidays.some(h => h.month === month && h.day === day);
-                    
-                    if (!isHoliday) {
-                        const input = inputs[day-1];
-                        
-                        const isLeave = input && input.classList.contains('leave-input');
-                        
-                        if (!isLeave) {
-                            normalHours += 8;
+                leaveSelect.querySelectorAll('div').forEach(div => {
+                    div.onclick = function() {
+                        const code = this.getAttribute('data-code');
+                        if (code === 'temizle') {
+                            input.value = '';
+                            input.parentElement.classList.remove('leave-type');
+                            input.classList.remove('leave-input');
+                        } else {
+                            input.value = code;
+                            input.parentElement.classList.add('leave-type');
+                            input.classList.add('leave-input');
                         }
-                    }
-                }
-            }
-            
-            return normalHours;
-        }
-
-        function validateHours(input) {
-            if (!input.classList.contains('leave-input')) {
-                let value = parseInt(input.value) || 0;
-                if(value < 0) input.value = 0;
-                if(value > 24) input.value = 24;
-            }
-            calculateOvertime(input.closest('tr'));
-            trackChanges();
-        }
-
-        function generateCalendar() {
-            const month = parseInt(document.getElementById('monthSelect').value);
-            const year = parseInt(document.getElementById('yearSelect').value);
-            const daysInMonth = new Date(year, month, 0).getDate();
-            const firstDay = new Date(year, month-1, 1).getDay();
-
-            const thead = document.querySelector('#personelTable thead tr');
-            while(thead.children.length > 7) thead.removeChild(thead.lastChild);
-            for(let i=1; i<=daysInMonth; i++) {
-                const th = document.createElement('th');
-                th.textContent = i;
-                th.className = 'day-column';
-                thead.appendChild(th);
-            }
-
-            document.querySelectorAll('#personelTable tbody tr').forEach(row => {
-                const existingInputValues = [];
-                const existingLeaveData = [];
-                
-                row.querySelectorAll('.hours').forEach(input => {
-                    existingInputValues.push(input.value);
-                    
-                    if (input.classList.contains('leave-input')) {
-                        existingLeaveData.push({
-                            index: existingInputValues.length - 1,
-                            code: input.value
-                        });
-                    }
+                        
+                        leaveSelect.style.display = 'none';
+                        calculateOvertime(input.closest('tr'));
+                        trackChanges();
+                    };
                 });
                 
-                const tcCol = row.children[0].cloneNode(true);
-                const nameCol = row.children[1].cloneNode(true);
-                const surnameCol = row.children[2].cloneNode(true);
-                const titleCol = row.children[3].cloneNode(true);
-                const totalWorkCol = row.children[4].cloneNode(true);
-                const normalHoursCol = row.children[5].cloneNode(true);
-                const overtimeCol = row.children[6].cloneNode(true);
-                
-                while(row.children.length > 0) {
-                    row.removeChild(row.children[0]);
+                document.addEventListener('click', closeLeaveSelect);
+            }
+            
+            function closeLeaveSelect(event) {
+                const leaveSelect = document.getElementById('leaveTypeSelect');
+                if (event && event.target.closest('#leaveTypeSelect')) return;
+                leaveSelect.style.display = 'none';
+                document.removeEventListener('click', closeLeaveSelect);
+            }
+
+            function addRow() {
+                if (document.querySelector('#personelTable thead tr').children.length <= 7) {
+                    generateCalendar();
                 }
                 
-                row.appendChild(tcCol);
-                row.appendChild(nameCol);
-                row.appendChild(surnameCol);
-                row.appendChild(titleCol);
-                row.appendChild(totalWorkCol);
-                row.appendChild(normalHoursCol);
-                row.appendChild(overtimeCol);
+                let table = document.getElementById("personelTable").getElementsByTagName('tbody')[0];
+                let newRow = document.createElement('tr');
+                
+                let tcCell = document.createElement('td');
+                let tcInput = document.createElement('input');
+                tcInput.type = 'text';
+                tcInput.className = 'tcNo';
+                tcInput.inputmode = 'numeric';
+                tcInput.oninput = (e) => e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                tcInput.onblur = () => validateTC(tcInput);
+                tcInput.maxLength = 11;
+                tcInput.placeholder = "TC";
+                tcCell.appendChild(tcInput);
+                newRow.appendChild(tcCell);
+                
+                let nameCell = document.createElement('td');
+                let nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.placeholder = "Ad";
+                nameCell.appendChild(nameInput);
+                newRow.appendChild(nameCell);
+                
+                let surnameCell = document.createElement('td');
+                let surnameInput = document.createElement('input');
+                surnameInput.type = 'text';
+                surnameInput.placeholder = "Soyad";
+                surnameCell.appendChild(surnameInput);
+                newRow.appendChild(surnameCell);
+                
+                let titleCell = document.createElement('td');
+                let titleSelect = document.createElement('select');
+                let options = ['Tıbbi Sekreter', 'Hemşire', 'Doktor', 'Ebe'];
+                options.forEach(option => {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    titleSelect.appendChild(optionElement);
+                });
+                titleCell.appendChild(titleSelect);
+                newRow.appendChild(titleCell);
+                
+                let totalWorkCell = document.createElement('td');
+                totalWorkCell.className = 'total-work-cell';
+                totalWorkCell.textContent = '0';
+                newRow.appendChild(totalWorkCell);
+                
+                let normalHoursCell = document.createElement('td');
+                normalHoursCell.className = 'normal-hours-cell';
+                normalHoursCell.textContent = '0';
+                newRow.appendChild(normalHoursCell);
+                
+                let overtimeCell = document.createElement('td');
+                overtimeCell.className = 'overtime-cell';
+                overtimeCell.textContent = '0';
+                newRow.appendChild(overtimeCell);
+                
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const daysInMonth = new Date(year, month, 0).getDate();
+                const firstDay = new Date(year, month-1, 1).getDay();
                 
                 let currentDay = firstDay;
                 for(let day=1; day<=daysInMonth; day++) {
@@ -437,13 +326,7 @@
                     input.type = 'text';
                     input.min = 0;
                     input.max = 24;
-                    
-                    if (existingInputValues.length > day-1) {
-                        input.value = existingInputValues[day-1];
-                    } else {
-                        input.value = 0;
-                    }
-                    
+                    input.value = 0;
                     input.className = 'hours day-input';
                     input.oninput = () => validateHours(input);
                     
@@ -455,226 +338,428 @@
                     if(currentDay === 0 || currentDay === 6) td.classList.add('weekend');
                     if(holidays.some(h => h.month === month && h.day === day)) td.classList.add('holiday');
                     
-                    const existingLeave = existingLeaveData.find(l => l.index === day-1);
-                    if (existingLeave) {
-                        input.value = existingLeave.code;
-                        input.classList.add('leave-input');
-                        td.classList.add('leave-type');
-                    }
-                    
                     td.appendChild(input);
-                    row.appendChild(td);
+                    newRow.appendChild(td);
                     currentDay = (currentDay + 1) % 7;
                 }
                 
-                const tcInput = row.querySelector('.tcNo');
-                if (tcInput) {
-                    tcInput.onblur = () => validateTC(tcInput);
-                }
+                table.appendChild(newRow);
                 
-                calculateOvertime(row);
-            });
-        }
-
-        let formChanged = false;
-        
-        function trackChanges() {
-            formChanged = true;
-        }
-        
-        function setupChangeTracking() {
-            document.querySelectorAll('input, select').forEach(element => {
-                element.addEventListener('change', trackChanges);
-                element.addEventListener('input', trackChanges);
-            });
-            
-            document.querySelectorAll('button').forEach(button => {
-                if (button.innerHTML === 'Ekle' || button.innerHTML === 'Tatil Ekle') {
-                    button.addEventListener('click', trackChanges);
-                }
-            });
-            
-            window.addEventListener('beforeunload', function(e) {
-                if (formChanged) {
-                    const message = 'Formdaki değişiklikler kaydedilmeyecek. Sayfadan ayrılmak istediğinize emin misiniz?';
-                    e.returnValue = message;
-                    return message;
-                }
-            });
-        }
-
-        function generateDailyReport() {
-            const table = document.getElementById('personelTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            
-            if (rows.length === 0) {
-                alert('Personel kaydı bulunamadı!');
-                return;
+                calculateOvertime(newRow);
+                trackChanges();
             }
-            
-            const monthSelect = document.getElementById('monthSelect');
-            const yearSelect = document.getElementById('yearSelect');
-            const monthName = monthSelect.options[monthSelect.selectedIndex].text;
-            const year = yearSelect.value;
-            const month = parseInt(monthSelect.value);
-            const daysInMonth = new Date(year, month, 0).getDate();
-            
-            const excelData = [];
-            
-            excelData.push(["Tarih", "8 Saat Çalışanlar", "16 Saat Çalışanlar", "24 Saat Çalışanlar"]);
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateKey = `${year}-${month}-${day}`;
-                const workers = dailyWorkers[dateKey] || {};
+
+            function calculateOvertime(row) {
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const inputs = row.querySelectorAll('.hours');
                 
-                const workers8 = [];
-                const workers16 = [];
-                const workers24 = [];
+                let totalWorkHours = 0;
                 
-                Object.values(workers).forEach(worker => {
-                    const workerInfo = `${worker.name} (${worker.title})`;
-                    if (worker.hours === 8) {
-                        workers8.push(workerInfo);
-                    } else if (worker.hours === 16) {
-                        workers16.push(workerInfo);
-                    } else if (worker.hours === 24) {
-                        workers24.push(workerInfo);
+                inputs.forEach((input, index) => {
+                    const day = index + 1;
+                    
+                    const isLeave = input.classList.contains('leave-input');
+                    
+                    if (!isLeave) {
+                        const hours = parseInt(input.value) || 0;
+                        totalWorkHours += hours;
+                        
+                        const dateKey = `${year}-${month}-${day}`;
+                        if (!dailyWorkers[dateKey]) {
+                            dailyWorkers[dateKey] = {};
+                        }
+                        
+                        if (hours > 0) {
+                            const workerKey = `${row.cells[0].querySelector('input').value}-${row.cells[1].querySelector('input').value}-${row.cells[2].querySelector('input').value}`;
+                            dailyWorkers[dateKey][workerKey] = {
+                                hours: hours,
+                                name: `${row.cells[1].querySelector('input').value} ${row.cells[2].querySelector('input').value}`,
+                                title: row.cells[3].querySelector('select').value
+                            };
+                        }
                     }
                 });
                 
-                excelData.push([
-                    `${day}/${month}/${year}`,
-                    workers8.join('\n'),
-                    workers16.join('\n'),
-                    workers24.join('\n')
-                ]);
+                const normalHours = calculateMonthlyNormalHours(row);
+                
+                const overtimeHours = Math.max(0, totalWorkHours - normalHours);
+                
+                row.querySelector('.total-work-cell').textContent = totalWorkHours;
+                row.querySelector('.normal-hours-cell').textContent = normalHours;
+                row.querySelector('.overtime-cell').textContent = overtimeHours;
             }
             
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-            
-            const columns = [
-                { wch: 15 },
-                { wch: 40 },
-                { wch: 40 },
-                { wch: 40 },
-            ];
-            worksheet['!cols'] = columns;
-            
-            const range = XLSX.utils.decode_range(worksheet['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cell_address = {c: C, r: R};
-                    const cell_ref = XLSX.utils.encode_cell(cell_address);
-                    if (!worksheet[cell_ref]) continue;
-                    worksheet[cell_ref].s = {
-                        alignment: {
-                            wrapText: true,
-                            vertical: 'top'
+            function calculateMonthlyNormalHours(row) {
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const daysInMonth = new Date(year, month, 0).getDate();
+                const inputs = row.querySelectorAll('.hours');
+                
+                let normalHours = 0;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month-1, day);
+                    const dayOfWeek = date.getDay();
+                    
+                    if (dayOfWeek > 0 && dayOfWeek < 6) {
+                        const isHoliday = holidays.some(h => h.month === month && h.day === day);
+                        
+                        if (!isHoliday) {
+                            const input = inputs[day-1];
+                            
+                            const isLeave = input && input.classList.contains('leave-input');
+                            
+                            if (!isLeave) {
+                                normalHours += 8;
+                            }
                         }
-                    };
+                    }
                 }
+                
+                return normalHours;
             }
-            
-            XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
-            
-            XLSX.writeFile(workbook, `Gunluk_Calisma_Raporu_${monthName}_${year}.xlsx`);
-        }
 
-        function generateOvertimeReport() {
-            const table = document.getElementById('personelTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            function validateHours(input) {
+                if (!input.classList.contains('leave-input')) {
+                    let value = parseInt(input.value) || 0;
+                    if(value < 0) input.value = 0;
+                    if(value > 24) input.value = 24;
+                }
+                calculateOvertime(input.closest('tr'));
+                trackChanges();
+            }
+
+            function generateCalendar() {
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const daysInMonth = new Date(year, month, 0).getDate();
+                const firstDay = new Date(year, month-1, 1).getDay();
+
+                const thead = document.querySelector('#personelTable thead tr');
+                while(thead.children.length > 7) thead.removeChild(thead.lastChild);
+                for(let i=1; i<=daysInMonth; i++) {
+                    const th = document.createElement('th');
+                    th.textContent = i;
+                    th.className = 'day-column';
+                    thead.appendChild(th);
+                }
+
+                document.querySelectorAll('#personelTable tbody tr').forEach(row => {
+                    const existingInputValues = [];
+                    const existingLeaveData = [];
+                    
+                    row.querySelectorAll('.hours').forEach(input => {
+                        existingInputValues.push(input.value);
+                        
+                        if (input.classList.contains('leave-input')) {
+                            existingLeaveData.push({
+                                index: existingInputValues.length - 1,
+                                code: input.value
+                            });
+                        }
+                    });
+                    
+                    const tcCol = row.children[0].cloneNode(true);
+                    const nameCol = row.children[1].cloneNode(true);
+                    const surnameCol = row.children[2].cloneNode(true);
+                    const titleCol = row.children[3].cloneNode(true);
+                    const totalWorkCol = row.children[4].cloneNode(true);
+                    const normalHoursCol = row.children[5].cloneNode(true);
+                    const overtimeCol = row.children[6].cloneNode(true);
+                    
+                    while(row.children.length > 0) {
+                        row.removeChild(row.children[0]);
+                    }
+                    
+                    row.appendChild(tcCol);
+                    row.appendChild(nameCol);
+                    row.appendChild(surnameCol);
+                    row.appendChild(titleCol);
+                    row.appendChild(totalWorkCol);
+                    row.appendChild(normalHoursCol);
+                    row.appendChild(overtimeCol);
+                    
+                    let currentDay = firstDay;
+                    for(let day=1; day<=daysInMonth; day++) {
+                        const td = document.createElement('td');
+                        td.className = 'day-column';
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.min = 0;
+                        input.max = 24;
+                        
+                        if (existingInputValues.length > day-1) {
+                            input.value = existingInputValues[day-1];
+                        } else {
+                            input.value = 0;
+                        }
+                        
+                        input.className = 'hours day-input';
+                        input.oninput = () => validateHours(input);
+                        
+                        input.ondblclick = function(e) {
+                            e.preventDefault();
+                            showLeaveSelect(this);
+                        };
+
+                        if(currentDay === 0 || currentDay === 6) td.classList.add('weekend');
+                        if(holidays.some(h => h.month === month && h.day === day)) td.classList.add('holiday');
+                        
+                        const existingLeave = existingLeaveData.find(l => l.index === day-1);
+                        if (existingLeave) {
+                            input.value = existingLeave.code;
+                            input.classList.add('leave-input');
+                            td.classList.add('leave-type');
+                        }
+                        
+                        td.appendChild(input);
+                        row.appendChild(td);
+                        currentDay = (currentDay + 1) % 7;
+                    }
+                    
+                    const tcInput = row.querySelector('.tcNo');
+                    if (tcInput) {
+                        tcInput.onblur = () => validateTC(tcInput);
+                    }
+                    
+                    calculateOvertime(row);
+                });
+            }
+
+            let formChanged = false;
             
-            if (rows.length === 0) {
-                alert('Personel kaydı bulunamadı!');
-                return;
+            function trackChanges() {
+                formChanged = true;
             }
             
-            const monthSelect = document.getElementById('monthSelect');
-            const yearSelect = document.getElementById('yearSelect');
-            const monthName = monthSelect.options[monthSelect.selectedIndex].text;
-            const year = yearSelect.value;
-            
-            const excelData = [];
-            
-            excelData.push(["TC Kimlik No", "Adı", "Soyadı", "Unvan", "Toplam Çalışma", "Normal Çalışma", "Fazla Mesai"]);
-            
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                
-                const tcInput = row.cells[0].querySelector('input');
-                const firstNameInput = row.cells[1].querySelector('input');
-                const lastNameInput = row.cells[2].querySelector('input');
-                const titleSelect = row.cells[3].querySelector('select');
-                
-                if (!tcInput || !firstNameInput || !lastNameInput || !titleSelect) continue;
-                
-                const tcNo = tcInput.value;
-                const firstName = firstNameInput.value;
-                const lastName = lastNameInput.value;
-                const title = titleSelect.value;
-                
-                const totalWork = row.cells[4].textContent;
-                const normalHours = row.cells[5].textContent;
-                const overtime = row.cells[6].textContent;
-                
-                if (!tcNo || !firstName || !lastName) continue;
-                
-                console.log('Satır Verileri:', {
-                    tcNo,
-                    firstName,
-                    lastName,
-                    title,
-                    totalWork,
-                    normalHours,
-                    overtime
+            function setupChangeTracking() {
+                document.querySelectorAll('input, select').forEach(element => {
+                    element.addEventListener('change', trackChanges);
+                    element.addEventListener('input', trackChanges);
                 });
                 
-                excelData.push([
-                    tcNo,
-                    firstName,
-                    lastName,
-                    title,
-                    totalWork,
-                    normalHours,
-                    overtime
-                ]);
+                document.querySelectorAll('button').forEach(button => {
+                    if (button.innerHTML === 'Ekle' || button.innerHTML === 'Tatil Ekle') {
+                        button.addEventListener('click', trackChanges);
+                    }
+                });
+                
+                window.addEventListener('beforeunload', function(e) {
+                    if (formChanged) {
+                        const message = 'Formdaki değişiklikler kaydedilmeyecek. Sayfadan ayrılmak istediğinize emin misiniz?';
+                        e.returnValue = message;
+                        return message;
+                    }
+                });
             }
-            
-            console.log('Tüm Excel Verileri:', excelData);
-            
-            try {
+
+            function generateDailyReport() {
+                const table = document.getElementById('personelTable');
+                const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                
+                if (rows.length === 0) {
+                    alert('Personel kaydı bulunamadı!');
+                    return;
+                }
+                
+                const monthSelect = document.getElementById('monthSelect');
+                const yearSelect = document.getElementById('yearSelect');
+                const monthName = monthSelect.options[monthSelect.selectedIndex].text;
+                const year = yearSelect.value;
+                const month = parseInt(monthSelect.value);
+                const daysInMonth = new Date(year, month, 0).getDate();
+                
+                const excelData = [];
+                
+                // Sabit başlık satırı
+                excelData.push(["KURUM ADI", "SAĞLIK BAKANLIĞI", "", "", ""]);
+                excelData.push(["BİRİM ADI", "HALK SAĞLIĞI MERKEZİ", "", "", ""]);
+                excelData.push(["AY", monthName, "YIL", year, ""]);
+                excelData.push([""]); // Boş satır
+                excelData.push(["Tarih", "8 Saat Çalışanlar", "16 Saat Çalışanlar", "24 Saat Çalışanlar", "İzinli Personel"]);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateKey = `${year}-${month}-${day}`;
+                    const workers = dailyWorkers[dateKey] || {};
+                    
+                    const workers8 = [];
+                    const workers16 = [];
+                    const workers24 = [];
+                    const workersOnLeave = [];
+                    
+                    // İzinli personeli kontrol et
+                    Array.from(rows).forEach(row => {
+                        const dayInput = row.querySelectorAll('.hours')[day-1];
+                        if (dayInput && dayInput.classList.contains('leave-input')) {
+                            const tcNo = row.cells[0].querySelector('input').value;
+                            const name = row.cells[1].querySelector('input').value;
+                            const surname = row.cells[2].querySelector('input').value;
+                            const title = row.cells[3].querySelector('select').value;
+                            const leaveType = dayInput.value;
+                            
+                            const leaveTypeName = leaveTypes.find(lt => lt.code === leaveType)?.name || leaveType;
+                            workersOnLeave.push(`${name} ${surname} (${title}) - ${leaveTypeName}`);
+                        }
+                    });
+                    
+                    Object.values(workers).forEach(worker => {
+                        const workerInfo = `${worker.name} (${worker.title})`;
+                        if (worker.hours === 8) {
+                            workers8.push(workerInfo);
+                        } else if (worker.hours === 16) {
+                            workers16.push(workerInfo);
+                        } else if (worker.hours === 24) {
+                            workers24.push(workerInfo);
+                        }
+                    });
+                    
+                    excelData.push([
+                        `${day}/${month}/${year}`,
+                        workers8.join('\n'),
+                        workers16.join('\n'),
+                        workers24.join('\n'),
+                        workersOnLeave.join('\n')
+                    ]);
+                }
+                
                 const workbook = XLSX.utils.book_new();
                 const worksheet = XLSX.utils.aoa_to_sheet(excelData);
                 
                 const columns = [
                     { wch: 15 },
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 15 },
-                    { wch: 15 },
+                    { wch: 40 },
+                    { wch: 40 },
+                    { wch: 40 },
+                    { wch: 40 },
                 ];
                 worksheet['!cols'] = columns;
                 
+                const range = XLSX.utils.decode_range(worksheet['!ref']);
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        const cell_address = {c: C, r: R};
+                        const cell_ref = XLSX.utils.encode_cell(cell_address);
+                        if (!worksheet[cell_ref]) continue;
+                        
+                        // İlk 5 satır için farklı stil (başlık satırları)
+                        if (R < 5) {
+                            worksheet[cell_ref].s = {
+                                font: { bold: true },
+                                alignment: {
+                                    horizontal: 'left',
+                                    vertical: 'center'
+                                }
+                            };
+                        } else {
+                            worksheet[cell_ref].s = {
+                                alignment: {
+                                    wrapText: true,
+                                    vertical: 'top'
+                                }
+                            };
+                        }
+                    }
+                }
+                
                 XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
                 
-                XLSX.writeFile(workbook, `Fazla_Mesai_Raporu_${monthName}_${year}.xlsx`);
-                
-                console.log('Excel dosyası başarıyla oluşturuldu');
-            } catch (error) {
-                console.error('Excel oluşturma hatası:', error);
-                alert('Excel dosyası oluşturulurken bir hata oluştu: ' + error.message);
+                XLSX.writeFile(workbook, `Gunluk_Calisma_Raporu_${monthName}_${year}.xlsx`);
             }
-        }
 
-        window.onload = async function() {
-            await loadHolidays();
-            generateCalendar();
-            setupChangeTracking();
-            formChanged = false;
-        };
-    </script>
+            function generateOvertimeReport() {
+                const table = document.getElementById('personelTable');
+                const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                
+                if (rows.length === 0) {
+                    alert('Personel kaydı bulunamadı!');
+                    return;
+                }
+                
+                const monthSelect = document.getElementById('monthSelect');
+                const yearSelect = document.getElementById('yearSelect');
+                const monthName = monthSelect.options[monthSelect.selectedIndex].text;
+                const year = yearSelect.value;
+                
+                const excelData = [];
+                
+                excelData.push(["TC Kimlik No", "Adı", "Soyadı", "Unvan", "Fazla Mesai(Saat)", "İmza"]);
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    
+                    const tcInput = row.cells[0].querySelector('input');
+                    const firstNameInput = row.cells[1].querySelector('input');
+                    const lastNameInput = row.cells[2].querySelector('input');
+                    const titleSelect = row.cells[3].querySelector('select');
+                    
+                    if (!tcInput || !firstNameInput || !lastNameInput || !titleSelect) continue;
+                    
+                    const tcNo = tcInput.value;
+                    const firstName = firstNameInput.value;
+                    const lastName = lastNameInput.value;
+                    const title = titleSelect.value;
+                    const overtime = row.cells[6].textContent;
+                    
+                    if (!tcNo || !firstName || !lastName) continue;
+                    
+                    excelData.push([
+                        tcNo,
+                        firstName,
+                        lastName,
+                        title,
+                        overtime
+                    ]);
+                }
+                
+                try {
+                    const workbook = XLSX.utils.book_new();
+                    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+                    
+                    const columns = [
+                        { wch: 15 },
+                        { wch: 15 },
+                        { wch: 15 },
+                        { wch: 15 },
+                        { wch: 15 }
+                    ];
+                    worksheet['!cols'] = columns;
+                    
+                    // Başlık satırını kalın yap
+                    const range = XLSX.utils.decode_range(worksheet['!ref']);
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        const cell_address = {c: C, r: 0};
+                        const cell_ref = XLSX.utils.encode_cell(cell_address);
+                        if (worksheet[cell_ref]) {
+                            worksheet[cell_ref].s = {
+                                font: { bold: true },
+                                alignment: { vertical: 'center' }
+                            };
+                        }
+                    }
+                    
+                    XLSX.utils.book_append_sheet(workbook, worksheet, `${monthName} ${year}`);
+                    
+                    XLSX.writeFile(workbook, `Fazla_Mesai_Raporu_${monthName}_${year}.xlsx`);
+                    
+                    console.log('Excel dosyası başarıyla oluşturuldu');
+                } catch (error) {
+                    console.error('Excel oluşturma hatası:', error);
+                    alert('Excel dosyası oluşturulurken bir hata oluştu: ' + error.message);
+                }
+            }
+
+            function exportWorkSchedule() {
+                // ... removing entire function content ...
+            }
+
+            window.onload = async function() {
+                await loadHolidays();
+                generateCalendar();
+                setupChangeTracking();
+                formChanged = false;
+            };
+        </script>
+    </div>
 </body>
 </html>
