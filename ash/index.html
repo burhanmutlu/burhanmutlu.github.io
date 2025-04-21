@@ -6,53 +6,6 @@
     <title>Personel Takip</title>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .header {
-            background-color: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .header h1 {
-            margin: 0;
-            color: #333;
-            font-size: 24px;
-        }
-        .nav-menu {
-            background-color: #333;
-            padding: 10px 0;
-            margin-bottom: 20px;
-        }
-        .nav-menu ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .nav-menu li {
-            display: inline;
-        }
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .nav-menu a:hover {
-            background-color: #555;
-        }
-        .nav-menu a.active {
-            background-color: #4CAF50;
-        }
-        .main-content {
-            margin: 0 auto;
-            padding: 0 5px;
-        }
-    </style>
 </head>
 <body>
     <div id="menu-container"></div>
@@ -65,7 +18,7 @@
                 });
         </script>
         <label for="monthSelect">Ay:</label>
-        <select id="monthSelect" onchange="generateCalendar()" style="width: 100px; margin-right: 10px;">
+        <select id="monthSelect" onchange="generateCalendar()">
             <option value="1">Ocak</option>
             <option value="2">Şubat</option>
             <option value="3">Mart</option>
@@ -81,7 +34,7 @@
         </select>
 
         <label for="yearSelect">Yıl:</label>
-        <select id="yearSelect" onchange="generateCalendar()" style="width: 80px;">
+        <select id="yearSelect" onchange="generateCalendar()">
             <option value="2025" selected>2025</option>
             <option value="2026">2026</option>
             <option value="2027">2027</option>
@@ -123,10 +76,11 @@
                 </tbody>
             </table>
         </div>
-        <button onclick="addRow()" class="primary-button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px 0; transition: background-color 0.3s;">Ekle</button>
+        <button onclick="addRow()" class="primary-button">Ekle</button>
         
-        <div style="margin-top: 20px;">
-            <a href="holidays.html" class="nav-link">Resmi Tatil Yönetimi</a>
+        <div class="report-buttons">
+            <button onclick="generateDailyReport()" class="primary-button">Günlük Çalışma Raporu</button>
+            <button onclick="generateOvertimeReport()" class="primary-button">Fazla Mesai Raporu</button>
         </div>
         
         <!-- İzin tipi seçme kutusu (gizli) -->
@@ -613,14 +567,20 @@
                             workers24.push(workerInfo);
                         }
                     });
+
+                    // Her çalışma saati grubu için ayrı satırlar oluştur
+                    const maxRows = Math.max(workers8.length, workers16.length, workers24.length, workersOnLeave.length, 1);
                     
-                    excelData.push([
-                        `${day}/${month}/${year}`,
-                        workers8.join('\n'),
-                        workers16.join('\n'),
-                        workers24.join('\n'),
-                        workersOnLeave.join('\n')
-                    ]);
+                    for (let i = 0; i < maxRows; i++) {
+                        const rowData = [
+                            i === 0 ? `${day}/${month}/${year}` : "", // İlk satırda tarih, diğerlerinde boş
+                            workers8[i] || "",
+                            workers16[i] || "",
+                            workers24[i] || "",
+                            workersOnLeave[i] || ""
+                        ];
+                        excelData.push(rowData);
+                    }
                 }
                 
                 const workbook = XLSX.utils.book_new();
