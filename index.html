@@ -3,59 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Burhan Mutlu - Kişisel Sayfa</title>
+  <title>Burhan Mutlu - Yazılım & Sağlık Teknolojileri</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: 'Fira Code', monospace;
+      background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
       margin: 0;
       padding: 0;
-      color: #333;
+      color: #f0f0f0;
     }
     .container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: 40px auto;
+      background: rgba(0,0,0,0.8);
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      border-radius: 12px;
     }
     header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     header img {
-      width: 150px;
-      height: 150px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       object-fit: cover;
+      border: 3px solid #00d1b2;
     }
-    h1, h2 {
-      margin: 10px 0;
+    h1 {
+      margin-top: 10px;
+      font-size: 2.2em;
+      color: #00d1b2;
     }
-    section {
-      margin-bottom: 20px;
+    h2 {
+      border-bottom: 1px solid #00d1b2;
+      padding-bottom: 5px;
+      color: #00f7ff;
+    }
+    p, li {
+      font-size: 1em;
+      line-height: 1.6;
     }
     ul {
       list-style-type: none;
       padding: 0;
     }
     li {
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       padding-left: 20px;
       position: relative;
     }
     li:before {
-      content: "•";
+      content: "\25B6";
       position: absolute;
       left: 0;
-      color: #007BFF;
+      color: #00d1b2;
+    }
+    .social-icons {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .social-icons a {
+      margin: 0 10px;
+      display: inline-block;
+    }
+    .social-icons img {
+      width: 32px;
+      height: 32px;
+      filter: invert(1);
     }
     footer {
       text-align: center;
       font-size: 0.9em;
-      color: #777;
-      border-top: 1px solid #ddd;
-      padding-top: 10px;
+      color: #bbb;
+      border-top: 1px solid #00d1b2;
+      padding-top: 15px;
+      margin-top: 30px;
+    }
+    .highlight {
+      color: #00f7ff;
     }
   </style>
 </head>
@@ -64,38 +92,51 @@
     <header>
       <img src="ben.jpg" alt="Burhan Mutlu">
       <h1>Burhan Mutlu</h1>
-      <p>Mersin Üniversitesi, Bilişim Sistemleri ve Teknolojileri Bölümü Mezunu</p>
+      <p>Bilişim Sistemleri ve Teknolojileri Mezunu & Sağlık Yönetimi Öğrencisi</p>
     </header>
-    
+
     <section>
       <h2>Hakkımda</h2>
       <p>
-        Merhaba, ben Burhan. 2001 doğumluyum, Adanalıyım ve şu anda Antalyada yaşıyorum. HBYS konusunda 2 yıldan fazla tecrübeye sahibim ve insanlarla iletişim konusunda da önemli deneyimler edindim. Kendimi web, mobil, görüntü işleme ve programlamanın geniş alanlarında sürekli geliştiriyorum.
+        Merhaba, ben <span class="highlight">Burhan</span>. 2001 doğumluyum, Adanalıyım ve şu an Antalya'da yaşıyorum. Sağlık sektöründe çalışırken bir yandan da yazılıma tutkuyla bağlıyım.
+        <br><br>
+        Yazılım ve sağlık disiplinlerini bir araya getirerek <span class="highlight">HBYS</span> alanında 2+ yıllık tecrübeye sahibim. Ayrıca <span class="highlight">kriptoloji, algoritmalar, görüntü işleme</span> ve matematiksel yaklaşımlar gibi ileri konularla yakından ilgileniyorum.
       </p>
     </section>
-    
+
     <section>
-      <h2>Deneyimlerim ve Becerilerim</h2>
+      <h2>Yetenekler & Teknolojiler</h2>
       <ul>
-        <li>HBYS: 2+ yıl deneyim</li>
-        <li>Web Geliştirme</li>
-        <li>Mobil Uygulama Geliştirme</li>
-        <li>Görüntü İşleme</li>
-        <li>Programlama (çeşitli diller)</li>
-        <li>İnsanlarla İletişim Becerileri</li>
+        <li>Java, Spring Boot, PHP, Python, C++, C#, JavaScript, HTML/CSS</li>
+        <li>MySQL, Microsoft SQL Server, Git, CMS sistemleri</li>
+        <li>OOP, Backend Development, Data Structures</li>
+        <li>Görüntü İşleme (Image Processing), OpenCV</li>
+        <li>İletişim Becerileri, Takım Çalışması</li>
       </ul>
     </section>
-    
+
     <section>
       <h2>Eğitim</h2>
-      <p>Mersin Üniversitesi, Bilişim Sistemleri ve Teknolojileri Bölümü</p>
+      <ul>
+        <li><strong>Mersin Üniversitesi</strong> - Bilişim Sistemleri ve Teknolojileri, Lisans (GPA: 3.52)</li>
+        <li><strong>Atatürk Üniversitesi</strong> - Tıbbi Dokümantasyon ve Sekreterlik (Ön Lisans)</li>
+        <li><strong>İstanbul Üniversitesi</strong> - Sağlık Yönetimi (Lisans Tamamlama)</li>
+      </ul>
     </section>
 
-    <div>
-      <a href="ash/index.html">Ash</a>
-    
+    <section>
+      <h2>Bağlantılar</h2>
+      <div class="social-icons">
+        <a href="https://github.com/burhanmutlu"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg" alt="GitHub"></a>
+        <a href="https://www.linkedin.com/in/burhanmutlu/"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/linkedin.svg" alt="LinkedIn"></a>
+        <a href="https://www.youtube.com/@burhanmutlu"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg" alt="YouTube"></a>
+        <a href="https://www.instagram.com/burhanmmutlu/"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg" alt="Instagram"></a>
+        <a href="https://burhanmutlu.github.io/"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/webcomponents.svg" alt="Web"></a>
+      </div>
+    </section>
+
     <footer>
-      <p>&copy; 2025 Burhan Mutlu. Tüm hakları saklıdır.</p>
+      <p>&copy; 2025 Burhan Mutlu. Tüm hakları saklıdır. Yazılım & Sağlık Teknolojileri</p>
     </footer>
   </div>
 </body>
