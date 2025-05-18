@@ -1,0 +1,16 @@
+[
+    { "month": 1, "day": 1, "name": "Yılbaşı Tatili" },
+    { "month": 3, "day": 30, "name": "Ramazan Bayramı (1. Gün)" },
+    { "month": 3, "day": 31, "name": "Ramazan Bayramı (2. Gün)" },
+    { "month": 4, "day": 1, "name": "Ramazan Bayramı (3. Gün)" },
+    { "month": 4, "day": 23, "name": "Ulusal Egemenlik ve Çocuk Bayramı" },
+    { "month": 5, "day": 1, "name": "İşçi Bayramı" },
+    { "month": 5, "day": 19, "name": "Atatürk'ü Anma, Gençlik ve Spor Bayramı" },
+    { "month": 6, "day": 6, "name": "Kurban Bayramı (1. Gün)" },
+    { "month": 6, "day": 7, "name": "Kurban Bayramı (2. Gün)" },
+    { "month": 6, "day": 8, "name": "Kurban Bayramı (3. Gün)" },
+    { "month": 6, "day": 9, "name": "Kurban Bayramı (4. Gün)" },
+    { "month": 7, "day": 15, "name": "Demokrasi ve Milli Birlik Günü" },
+    { "month": 8, "day": 30, "name": "Zafer Bayramı" },
+    { "month": 10, "day": 29, "name": "Cumhuriyet Bayramı" }
+] 
