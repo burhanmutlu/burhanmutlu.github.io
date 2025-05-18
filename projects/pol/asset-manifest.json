@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/projects/pol/static/css/main.dbab47b7.css",
+    "main.js": "/projects/pol/static/js/main.b83b31fa.js",
+    "static/js/453.2d3e0186.chunk.js": "/projects/pol/static/js/453.2d3e0186.chunk.js",
+    "index.html": "/projects/pol/index.html",
+    "main.dbab47b7.css.map": "/projects/pol/static/css/main.dbab47b7.css.map",
+    "main.b83b31fa.js.map": "/projects/pol/static/js/main.b83b31fa.js.map",
+    "453.2d3e0186.chunk.js.map": "/projects/pol/static/js/453.2d3e0186.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dbab47b7.css",
+    "static/js/main.b83b31fa.js"
+  ]
+}
